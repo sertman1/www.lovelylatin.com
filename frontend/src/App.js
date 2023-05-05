@@ -20,7 +20,6 @@ function App() {
     try {
       const response = await axios.get(`${API}/output`, { params: {userInput} })
       const data = response.data
-      console.log(data)
       setOutput(data)
     } catch (err) {
       alert('err')
@@ -65,7 +64,7 @@ function App() {
     } else {
       return (
         <div>
-          <TextField fullWidth label="Enter your Latin text or keywords here (e.g., Pythagoras faba)"
+          <TextField fullWidth label="Enter your Latin text or keywords here (e.g., faba Pythagoras)"
             id="fullWidth"
             margin="normal"
             onKeyDown={keyPress}
