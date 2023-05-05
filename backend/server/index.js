@@ -11,7 +11,7 @@ async function process_text(req,res) {
   try {
     var spawn = require("child_process").spawn;
 
-    var executor = spawn('python', ["./latin_processor.py",
+    var executor = spawn('python', ["./latin_processing/latin_processor.py",
       userInput]);
 
     executor.stdout.on('data', (data) => {
@@ -20,10 +20,6 @@ async function process_text(req,res) {
 
     executor.stderr.on('data', (data) => {
       console.error(`stderr: ${data}`);
-    });
-
-    executor.on('close', (code) => {
-      console.log(`child process exited with code ${code}`)
     });
 
   } catch (err) {
