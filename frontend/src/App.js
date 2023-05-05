@@ -2,17 +2,19 @@ import { useState } from "react"
 import axios from "axios"
 import { TextField, Button, Container } from "@material-ui/core"
 
-const API = "http://localhost:5000/"
+const API = "http://localhost:5000"
 
 function App() {
   const [userInput, setUserInput] = useState("")
 
-  const enter = async (e) => {
-    e.preventDefault()
+  const enter = async () => {
+    if (userInput === "") {
+      alert('please enter text!')
+    }
+
     try {
-      const response = await axios.get(`${API}`)
+      const response = await axios.get(`${API}/output`, { params: {userInput} })
       const data = response.data
-      alert(data)
     } catch (err) {
       console.log(err)
     }

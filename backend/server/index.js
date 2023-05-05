@@ -10,7 +10,10 @@ app.get("/", (req, res) => {
 });
 
 app.get("/output", (req, res) => {
-  const { query } = req.query
+  const { query } = req.query.userInput
+
+  
+  
   res.json({ query })
 });
 
