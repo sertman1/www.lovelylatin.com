@@ -1,6 +1,8 @@
 import { useState } from "react"
 import axios from "axios"
 import { TextField, Button, Container, Box } from "@material-ui/core"
+import Header from "./components/Header.js"
+import Footer from "./components/Footer.js"
 
 const API = "http://localhost:5000"
 
@@ -15,21 +17,22 @@ function App() {
       return
     }
 
-    setHasEntered(true)
-
     try {
       const response = await axios.get(`${API}/output`, { params: {userInput} })
       const data = response.data
+      console.log(data)
       setOutput(data)
     } catch (err) {
+      alert('err')
       console.log(err)
     }
 
+    setHasEntered(true)
     return
   }
 
   const keyPress = (e) => {
-    if (e.keyCode == 13) {
+    if (e.keyCode === 13) {
       enter()
     }
   }
@@ -60,7 +63,7 @@ function App() {
     } else {
       return (
         <div>
-          <TextField fullWidth label="Enter your Latin text here"
+          <TextField fullWidth label="Enter your Latin text or keywords here (e.g., Pythagoras faba)"
             id="fullWidth"
             margin="normal"
             onKeyDown={keyPress}
@@ -75,10 +78,20 @@ function App() {
   }
 
   return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <Container>
         <h1>The Lovely Latin Language</h1>
         {showOptions()}
+        <Header></Header>
+        <Footer></Footer>
       </Container>
+    </div>
   );
 
 }
