@@ -2,7 +2,7 @@ import { useState } from "react"
 import axios from "axios"
 import { TextField, Button, Container } from "@material-ui/core"
 
-const API = "http://localhost:5000/"
+const API = "https://lovelylatin.herokuapp.com/"
 
 function App() {
   const [userInput, setUserInput] = useState("")
