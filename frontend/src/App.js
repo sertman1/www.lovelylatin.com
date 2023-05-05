@@ -90,7 +90,7 @@ function App() {
 
         }}
       >
-        <h1>The Lovely Latin Language</h1>
+        <h1>Search the Lovely Latin Language</h1>
       </div>
 
       {showOptions()}
