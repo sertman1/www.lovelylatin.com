@@ -47,7 +47,7 @@ function App() {
             whiteSpace: 'normal',
             display: 'block',
             p: 1,
-            m: 1,
+            mb: 1,
             bgcolor: 'white',
             color: 'grey.300',
             border: '1px solid',
@@ -55,9 +55,11 @@ function App() {
           }}>
             {output}
           </Box>
-          <Button variant="contained" onClick={() => {setHasEntered(false); setUserInput("")} }>
-            Enter more text
-          </Button>
+          <div>
+            <Button variant="contained" onClick={() => {setHasEntered(false); setUserInput("")} }>
+              Enter more text
+            </Button>
+          </div>
         </div>
       );
     } else {
@@ -68,6 +70,7 @@ function App() {
             margin="normal"
             onKeyDown={keyPress}
             onChange={(e) => setUserInput(e.target.value)}
+            multiline={true}
           />
           <Button variant="contained" onClick={enter}>
             Go!
@@ -78,20 +81,24 @@ function App() {
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Container>
+    <Container style={{ background: '#e1bee7' }} maxWidth={false}>
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+
+        }}
+      >
         <h1>The Lovely Latin Language</h1>
-        {showOptions()}
-        <Header></Header>
-        <Footer></Footer>
-      </Container>
-    </div>
+      </div>
+
+      {showOptions()}
+
+      <Footer></Footer>
+
+    </Container>
   );
 
 }
