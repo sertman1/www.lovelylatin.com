@@ -7,8 +7,9 @@ function Footer(props) {
         <p>{"Click "}
           <a href="https://github.com/sertman1/www.lovelylatin.com">here</a> for source code.
         </p>
-        <p>{"A special thank you to Colonel William Whitaker and his "}
-          <a href="https://latin-words.com/">Words</a>.
+        <p>{"A special thanks to "}
+          <a href="https://www.thelatinlibrary.com/"> The Latin Library</a>
+          {" and to "} <a href="https://latin-words.com/">William Whitaker's Words</a>.
         </p>
       </div>
 
