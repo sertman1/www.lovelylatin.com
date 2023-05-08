@@ -30,9 +30,11 @@ function App() {
     return
   }
 
-  const keyPress = (e) => {
-    if (e.keyCode === 13) {
-      enter()
+  const handelOnChange = (e) => {
+    if (e.key !== 'Enter') {
+      setUserInput(e.target.value)
+    } else {
+      alert('dicks')
     }
   }
 
@@ -67,13 +69,23 @@ function App() {
           <TextField fullWidth label="Enter your Latin text or keywords here (e.g., faba Pythagoras)"
             id="fullWidth"
             margin="normal"
-            onKeyDown={keyPress}
-            onChange={(e) => setUserInput(e.target.value)}
+            onChange={handelOnChange}
             multiline={true}
           />
-          <Button variant="contained" onClick={enter}>
-            Go!
-          </Button>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+
+            }}
+          >
+
+            <Button variant="contained" onClick={enter} size="large">
+              Go!
+            </Button>
+
+          </div>
         </div>
       );
     }
@@ -82,16 +94,7 @@ function App() {
   return (
     <Container style={{ background: '#e1bee7' }} maxWidth={false}>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-
-        }}
-      >
-        <h1>Search the Lovely Latin Language</h1>
-      </div>
+      <Header></Header>
 
       {showOptions()}
 
