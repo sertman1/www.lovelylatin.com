@@ -1,3 +1,5 @@
+import { Toolbar } from "@material-ui/core";
+
 function Footer(props) {
 
   return (
@@ -20,7 +22,8 @@ function Footer(props) {
           alignItems: 'center',
         }}
       >
-        <p>Made with 🌈 🍀 ✨ in Charm City</p>
+
+        <Toolbar style={{ position: "static" }}> <p>Made with 🌈 🍀 ✨ in Charm City</p> </Toolbar>
 
       </div>
 

@@ -12,14 +12,19 @@ function App() {
   const [hasEntered, setHasEntered] = useState(false)
   const [authorsSelected, setAuthorsSelected] = useState([])
 
+  const resetValues = () => {
+    setHasEntered(false); 
+    setUserInput(""); 
+    setOutput("");
+  }
+
   const enter = async () => {
     if (userInput === "") {
       alert('please enter text!')
       return
     }
-
-    alert(authorsSelected)
-
+    setHasEntered(true)
+    setOutput("Calculating results... Please be patient")
     try {
       const response = await axios.get(`${API}/output`, { params: {userInput} })
       const data = response.data
@@ -28,16 +33,18 @@ function App() {
       alert('err')
       console.log(err)
     }
-
-    setHasEntered(true)
     return
   }
 
   const handelOnChange = (e) => {
     if (e.key !== 'Enter') {
       setUserInput(e.target.value)
-    } else {
-      alert('dicks')
+    } 
+  }
+
+  const keyPress = (e) => {
+    if (e.keyCode === 13) {
+      enter()
     }
   }
 
@@ -60,7 +67,7 @@ function App() {
             {output}
           </Box>
           <div>
-            <Button variant="contained" onClick={() => {setHasEntered(false); setUserInput("")} }>
+            <Button variant="contained" onClick={() => {resetValues()} }>
               Enter more text
             </Button>
           </div>
@@ -73,8 +80,9 @@ function App() {
             id="fullWidth"
             margin="normal"
             onChange={handelOnChange}
+            onKeyDown={keyPress}
             multiline={true}
-            size="large"
+            size="medium"
           />
           <div
             style={{
@@ -85,7 +93,7 @@ function App() {
             }}
           >
 
-            <Button variant="contained" onClick={enter} size="large">
+            <Button variant="contained" onClick={enter} size="medium">
               Go!
             </Button>
 
@@ -98,11 +106,12 @@ function App() {
   return (
     <Container style={{ background: '#e1bee7' }} maxWidth={false}>
 
-      <Header authorsSelected={authorsSelected} setAuthorsSelected={setAuthorsSelected}></Header>
+        <Header authorsSelected={authorsSelected} setAuthorsSelected={setAuthorsSelected} hasEntered={hasEntered}></Header>
+      <div style={{ height: "25vh" }}>
+          {showOptions()}
+        </div>
 
-      {showOptions()}
-
-      <Footer></Footer>
+        <Footer></Footer>
 
     </Container>
   );

@@ -21,25 +21,17 @@ const MenuProps = {
 };
 
 const names = [
-  'Ammianus',
-  'Apuleius',
-  'Augustus',
-  'Aurelius Victor',
-  'Caesar',
-  'Cato',
-  'Catullus',
-  'Cicero',
-  'Catullus',
+  'Ammianus', 'Apuleius', 'Augustus', 'Aurelius Victor', 'Caesar', 'Cato', 'Catullus', 'Cicero', 'Claudian', 'Curtius Rufus', 'Ennius', 'Eutropius', 'Florus', 'Frontinus', 'Gellius', 'Historia Augusta', 'Horace', 'Justin', 'Juvenal', 'Livy', 'Lucan', 'Lucretius', 'Martial', 'Nepos', 'Ovid', 'Persius', 'Petronius', 'Phaedrus', 'Plautus', 'Pliny Maior', 'Pliny Minor', 'Propertius', 'Quintilian', 'Sallust', 'Seneca Maior', 'Seneca Minor', 'Silius Italicus', 'Statius', 'Suetonius', 'Sulpicia', 'Tacitus', 'Terence', 'Tibullus', 'Valerius Flaccus', 'Valerius Maximus', 'Varro', 'Velleius', 'Vergil', 'Vitruvius', 'Ius Romanum', 'Miscellany', 'Christian', 'Medieval', 'Neo-Latin'
 ]
 
 function Header(props) {
-  const [personName, setPersonName] = React.useState([]);
+  const {authorsSelected, setAuthorsSelected, hasEntered} = props
 
   const handleChange = (e) => {
     const {
       target: { value },
     } = e;
-    setPersonName(
+    setAuthorsSelected(
       // On autofill we get a stringified value.
       typeof value === 'string' ? value.split(',') : value,
     );
@@ -47,26 +39,49 @@ function Header(props) {
 
   const handleDelete = (e, value) => {
     e.preventDefault()
-    setPersonName(personName.filter((name) => name !== value));
+    setAuthorsSelected(authorsSelected.filter((name) => name !== value));
+  }
+
+  const getMissionStatement = () => {
+    if (hasEntered) {
+      return
+    }
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+
+        <p>Search the works of dozens of Latin authors or explore <i>The Great Beyonds...</i></p>
+
+      </div>
+    )
   }
 
   const handleReset = () => {
-    setPersonName([])
+    setAuthorsSelected([])
   }
 
   const getAuthorForm = () => {
+    if (hasEntered) {
+      return <div></div>
+    }
+
     return (
       <div>
+        <div style={{marginBottom: 5}}>
         <FormControl fullWidth={true}>
-          <InputLabel id="authors-label" size="small">Your Latin authors here</InputLabel>
+          <InputLabel id="authors-label">Select Latin authors</InputLabel>
           <Select
-            
             labelId="authors-label"
             id="authors"
             multiple
-            value={personName}
+            value={authorsSelected}
             onChange={handleChange}
-            input={<OutlinedInput id="select-multiple-chip" label="Your Latin authors here"/>}
+            input={<OutlinedInput id="select-multiple-chip" label="Select Latin authors"/>}
             renderValue={(selected) => (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                 {selected.map((value) => (
@@ -95,8 +110,15 @@ function Header(props) {
           </Select>
         </FormControl>
       </div>
+      <div>
+        <Button variant="contained" size="small" onClick={handleReset}>
+          Reset
+        </Button>
+      </div>
+      </div>
     )
   }
+
 
   return (
     <div>
@@ -111,25 +133,8 @@ function Header(props) {
       >
         <h1>Traverse the Lovely Latin Catalogue</h1>
       </div>
-
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-
-        }}
-      >
-
-        <p>Search the works of dozens of Latin authors or explore the Great Beyonds...</p>
-
-      </div>
-
+      <div>{getMissionStatement()} <p></p></div>
       {getAuthorForm()}
-
-      <Button variant="contained" size="small" onClick={handleReset}>
-        Reset
-      </Button>
 
     </div>
   )
