@@ -10,12 +10,15 @@ function App() {
   const [userInput, setUserInput] = useState("")
   const [output, setOutput] = useState("")
   const [hasEntered, setHasEntered] = useState(false)
+  const [authorsSelected, setAuthorsSelected] = useState([])
 
   const enter = async () => {
     if (userInput === "") {
       alert('please enter text!')
       return
     }
+
+    alert(authorsSelected)
 
     try {
       const response = await axios.get(`${API}/output`, { params: {userInput} })
@@ -66,11 +69,12 @@ function App() {
     } else {
       return (
         <div>
-          <TextField fullWidth label="Enter your Latin text or keywords here (e.g., faba Pythagoras)"
+          <TextField fullWidth label="Enter your Latin text or keywords (e.g. faba Pythagoras)"
             id="fullWidth"
             margin="normal"
             onChange={handelOnChange}
             multiline={true}
+            size="large"
           />
           <div
             style={{
@@ -94,7 +98,7 @@ function App() {
   return (
     <Container style={{ background: '#e1bee7' }} maxWidth={false}>
 
-      <Header></Header>
+      <Header authorsSelected={authorsSelected} setAuthorsSelected={setAuthorsSelected}></Header>
 
       {showOptions()}
 
