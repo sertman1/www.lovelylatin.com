@@ -55,7 +55,7 @@ function Header(props) {
         }}
       >
 
-        <p>Search the works of dozens of Latin authors or explore <i>The Great Beyonds...</i></p>
+        <b>Search the works of dozens of Latin authors or explore <i>The Great Beyonds...</i></b>
 
       </div>
     )
@@ -71,11 +71,12 @@ function Header(props) {
     }
 
     return (
-      <div>
+      <div style={{marginTop: 30}}>
         <div style={{marginBottom: 5}}>
         <FormControl fullWidth={true}>
-          <InputLabel id="authors-label">Select Latin authors</InputLabel>
+          <InputLabel id="authors-label" size="small">Select Latin authors</InputLabel>
           <Select
+            size="small"
             labelId="authors-label"
             id="authors"
             multiple
@@ -133,7 +134,8 @@ function Header(props) {
       >
         <h1>Traverse the Lovely Latin Catalogue</h1>
       </div>
-      <div>{getMissionStatement()} <p></p></div>
+      {getMissionStatement()}
+      <p></p>
       {getAuthorForm()}
 
     </div>

@@ -6,13 +6,13 @@ app.use(cors())
 const port = process.env.PORT || 5000;
 
 async function process_text(req,res) {
-  const { userInput } = req.query
+  const { userInput, authorsSelected } = req.query
 
   try {
     var spawn = require("child_process").spawn;
 
     var executor = spawn('python', ["./latin_processing/latin_processor.py",
-      userInput]);
+      userInput, authorsSelected]);
 
     executor.stdout.on('data', (data) => {
       res.send(data)

@@ -26,7 +26,12 @@ function App() {
     setHasEntered(true)
     setOutput("Calculating results... Please be patient")
     try {
-      const response = await axios.get(`${API}/output`, { params: {userInput} })
+      const response = await axios.get(`${API}/output`, 
+      {   params: {
+            userInput: userInput, 
+            authorsSelected: authorsSelected
+        } 
+      })
       const data = response.data
       setOutput(data)
     } catch (err) {
