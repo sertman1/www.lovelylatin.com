@@ -50,6 +50,10 @@ function Header(props) {
     setPersonName(personName.filter((name) => name !== value));
   }
 
+  const handleReset = () => {
+    setPersonName([])
+  }
+
   const getAuthorForm = () => {
     return (
       <div>
@@ -123,7 +127,7 @@ function Header(props) {
 
       {getAuthorForm()}
 
-      <Button variant="contained" size="small">
+      <Button variant="contained" size="small" onClick={handleReset}>
         Reset
       </Button>
 
