@@ -5,6 +5,7 @@ from urllib import request, parse
 from bs4 import BeautifulSoup
 import csv
 
+extracted_works = {} # maps authors to (work, title) pairs and to be returned to main processing script for vector modeling
 html_naming_conventions = {
     'Augustus': 'aug',
     'Aurelius Victor': 'victor',
@@ -37,12 +38,9 @@ html_naming_conventions = {
 
 logging.basicConfig(level=logging.DEBUG, filename='output.log', filemode='w')
 visitlog = logging.getLogger('visited')
-extractlog = logging.getLogger('extracted')
 
 def rank_link(link):
     rank = 0 # the higher the rank, the greater the priority to crawl 
-
-    url = link[0]
 
     return rank
 
@@ -70,7 +68,8 @@ def parse_links_sorted(root, html):
                 text = ''
             text = re.sub('\s+', ' ', text).strip()
             urls.append((parse.urljoin(root, link.get('href')), text))
- 
+
+    # TODO: Link rank (important for overall library traversal)
     urls.sort(reverse=True, key=rank_link)
     for url in urls:
         yield(url)
@@ -137,6 +136,7 @@ def get_author_name_from_workpage(url):
 def crawl(root_domain, authors=[]):
     queue = PriorityQueue()
 
+    get_all_home_links = False # to tell crawler that no author was specified and thus dealing with a homepage on first iteration of queue
     if len(authors) != 0: # if the user specified an author, alter root domain to just traverse those authors's works
         for author in authors:
             link_to_traverse = ""
@@ -152,10 +152,10 @@ def crawl(root_domain, authors=[]):
                 queue.put(link_to_traverse + ".html")
     else:
         queue.put(root_domain) # otherwise, just traverse the whole library
-
+        get_all_home_links = True
+        
     visited = []
-    extracted_works = {} # maps authors to (work, title) pairs and to be returned to main processing script for vector modeling
-
+    
     while not queue.empty():  
         url = queue.get()
         
@@ -163,7 +163,8 @@ def crawl(root_domain, authors=[]):
             req = request.urlopen(url)
             html = req.read()
 
-            author = get_author_name_from_workpage(url)
+            if not get_all_home_links: # i.e., if we are not on the homepage and thus on an author's profile
+                author = get_author_name_from_workpage(url)
 
             visited.append(url)
             visitlog.debug(url)
@@ -181,11 +182,11 @@ def crawl(root_domain, authors=[]):
                         
                         links_added_to_queue.append(link) 
                         queue.put(link)
-                    
-            if len(links_added_to_queue) == 0:
-                for ex in extract_information(url, html, author):
-                    extractlog.debug(ex)
-                    extracted_works[author] = ex
+
+            if len(links_added_to_queue) == 0 and not get_all_home_links:
+                extract_information(url, html, author)
+
+            get_all_home_links = False
 
         except Exception as e:
             print(e, url)
@@ -210,17 +211,19 @@ def extract_information(address, html, author):
             if add_section:
                 text += paragraph.getText()
 
-    return (title, text)
+    if author not in extracted_works:
+        extracted_works[author] = dict()
+
+    (extracted_works[author])[title] = text
 
 def write_to_csv(dict):
-    field_names = ['Author', 'Work', 'Text']
     with open('extracted_texts.csv', 'w') as f:
         for key in dict.keys():
             f.write("%s,%s,\n"%(key, dict[key]))
 
 def main():
-    authors = ['Cicero', 'Caesar', 'Catullus']
-    extracted_works = crawl("https://www.thelatinlibrary.com", authors) # to test crawler, otherwise, crawl imported by processor
+    authors = [] # to test crawler, otherwise, crawl imported and handled by processor
+    crawl("https://www.thelatinlibrary.com", authors) # populates extracted_works
     # TODO: rank_link?
     write_to_csv(extracted_works)
 
