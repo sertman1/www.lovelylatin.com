@@ -58,7 +58,7 @@ def is_self_referencing(link): # self referencing links in library are denoted w
 
     return False
 
-def parse_links_sorted(root, html, get_all_homelinks):
+def parse_links_sorted(root, html):
     urls = []
 
     soup = BeautifulSoup(html, 'html.parser')
@@ -141,7 +141,6 @@ def get_author_name_from_workpage(url):
 def crawl(root_domain, authors=[]):
     queue = PriorityQueue()
 
-    get_all_home_links = False # to tell crawler that no author was specified and thus dealing with a homepage on first iteration of queue
     if len(authors) != 0: # if the user specified an author, alter root domain to just traverse those authors's works
         for author in authors:
             link_to_traverse = ""
@@ -157,7 +156,6 @@ def crawl(root_domain, authors=[]):
                 queue.put(link_to_traverse + ".html")
     else:
         queue.put(root_domain) # otherwise, just traverse the whole library
-        get_all_home_links = True
         
     visited = []
     
@@ -170,15 +168,12 @@ def crawl(root_domain, authors=[]):
             req = request.urlopen(url)
             html = req.read()
 
-            if not get_all_home_links: # i.e., if we are not on the homepage and thus on an author's profile
-                # check for special url cases which open two a "2nd homepage"
-                if url != "https://www.thelatinlibrary.com/christian.html" or url != "https://www.thelatinlibrary.com/medieval.html" or url != "https://www.thelatinlibrary.com/neo.html":
-                    author = get_author_name_from_workpage(url)
+            author = get_author_name_from_workpage(url)
 
             visited.append(url)
             visitlog.debug(url)
             
-            links_on_page = parse_links_sorted(url, html, get_all_home_links)
+            links_on_page = parse_links_sorted(url, html)
             links_added_to_queue = [] # prevents repeat links from being added 
 
             for link, title in links_on_page:
@@ -191,10 +186,9 @@ def crawl(root_domain, authors=[]):
                         links_added_to_queue.append(link) 
                         queue.put(link)
 
-            if len(links_added_to_queue) == 0 and not get_all_home_links:
+            if len(links_added_to_queue) == 0:
                 extract_information(url, html, author)
 
-            get_all_home_links = False
 
         except Exception as e:
             print(e, url)
@@ -223,6 +217,7 @@ def extract_information(address, html, author):
         extracted_works[author] = dict()
 
     (extracted_works[author])[title] = text
+    write_to_csv(extracted_works)
 
 def write_to_csv(dict):
     with open('extracted_texts.csv', 'w') as f:
@@ -233,7 +228,6 @@ def main():
     authors = [] # to test crawler, otherwise, crawl imported and handled by processor
     crawl("https://www.thelatinlibrary.com", authors) # populates extracted_works
     # TODO: rank_link?
-    write_to_csv(extracted_works)
 
 if __name__ == '__main__':
     main()

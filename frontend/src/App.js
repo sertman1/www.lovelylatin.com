@@ -24,7 +24,12 @@ function App() {
       return
     }
     setHasEntered(true)
-    setOutput("Calculating results... Please be patient")
+    let output = "Processing results, please be patient"
+    if (authorsSelected.length === 0) {
+      output += " (full corpus searches take much longer...)"
+    }
+
+    setOutput(output)
     try {
       const response = await axios.get(`${API}/output`, 
       {   params: {

@@ -3,6 +3,9 @@
 import sys
 from nltk.tokenize import word_tokenize
 
+## auxilary scripts to help runtime processing
+from latin_crawler import crawl
+
 ### Weighting considerations:
 
 # prepositional phrases as a singular unit
@@ -11,7 +14,7 @@ from nltk.tokenize import word_tokenize
 # clearly some sort of inverse term document frequency to water down overused terms
 # n-gram model seems strong but dubious due to nonstandardized word ordering
 
-stopwords = word_tokenize("ac adhic an at atque aut autem cur de deinde dum enim et etiam etsi ex haud hic iam igitur interim ita magis modo nam ne nec necque neque nisi non quae quam quare quia quicumque quidem quilibet quis quisnam quisquam quisque quisquis quo quoniam sed si nisi sic sive tam tamen tum ubi uel uero ut")
+stopwords = word_tokenize("ac adhic an at atque aut autem cum cur de deinde dum enim et etiam etsi ex haud hic hoc iam igitur interim ita itaque magis modo nam ne nec necque neque nisi non quae quam quare quia quicumque quidem quilibet quis quisnam quisquam quisque quisquis quo quoniam sed si nisi sic sive tam tamen tum ubi uel uero ut")
 
 def remove_stopwords(tokens):
     pruned_sentence = list()
@@ -21,12 +24,7 @@ def remove_stopwords(tokens):
 
     return pruned_sentence
 
-def process_global_query(query):
-    report = "I. Your text: " + query + "\n"
-
-    # retrieve tokens from query
-    tokens = remove_stopwords(word_tokenize(query))
-
+###### GENERAL NOTES / CONSIDERATIONS FOR FUTURE IMPLEMENTATIONS
     # pre compute index of terms to documents (book, page level, section, etc.)
     # DRAW IT OUT FOR WRITE UP:
         # TERM INDEXES TO SECTION TO CHAPTER TO WORK TO AUHTOR
@@ -34,29 +32,29 @@ def process_global_query(query):
     # NB: can crawl common queries (vectors) while offline so answers are quickly found
     # NB: can include "terms to omit", "specify weights",
 
-            # weighted query expansion
+    # weighted query expansion
+def process_query(query, authors_selected):
+    report = ""
 
-    return report
+    # get appropriate text from library given authors selected 
+    extracted_texts = crawl("https://www.thelatinlibrary.com", authors_selected)
 
-def process_author_query(query, authors_selected):
-    report = "I. Selected Authors: " + str(authors_selected) + '\n'
-    report += "II. Your text: " + query + '\n'
-
-    # retrieve tokens from query
+    # process query
     tokens = remove_stopwords(word_tokenize(query))
 
     return report
 
 def main():
+    # Handle arguments provided from javascript backend:
     query = (sys.argv[1]).strip()
-    authors_selected = (sys.argv[2]).strip()
-
-    ## did user specify specific authors to search?
-    if authors_selected != "undefined":
-        authors_selected = authors_selected.split(',')
-        print(process_author_query(query, authors_selected))
+    if sys.argv[2] == "undefined":
+        # no authors selected by user --> backend must process them all
+        authors_selected = ['Ammianus', 'Apuleius', 'Augustus', 'Aurelius Victor', 'Caesar', 'Cato', 'Catullus', 'Cicero', 'Claudian', 'Curtius Rufus', 'Ennius', 'Eutropius', 'Florus', 'Frontinus', 'Gellius', 'Historia Augusta', 'Horace', 'Justin', 'Juvenal', 'Livy', 'Lucan', 'Lucretius', 'Martial', 'Nepos', 'Ovid', 'Persius', 'Petronius', 'Phaedrus', 'Plautus', 'Pliny Maior', 'Pliny Minor', 'Propertius', 'Quintilian', 'Sallust', 'Seneca Maior', 'Seneca Minor', 'Silius Italicus', 'Statius', 'Suetonius', 'Sulpicia', 'Tacitus', 'Terence', 'Tibullus', 'Valerius Flaccus', 'Valerius Maximus', 'Varro', 'Velleius', 'Vergil', 'Vitruvius']
     else:
-        print(process_global_query(query)) # print to stdout so that javascript can interpret results
+        authors_selected = (sys.argv[2]).strip().split(',')
+
+    # calculate result for client
+    print(process_query(query, authors_selected)) # print to stdout so that javascript can interpret results
 
 if __name__ == "__main__":
     main()
