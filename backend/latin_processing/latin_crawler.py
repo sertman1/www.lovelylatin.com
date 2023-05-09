@@ -36,6 +36,7 @@ html_naming_conventions = {
 
 logging.basicConfig(level=logging.DEBUG, filename='output.log', filemode='w')
 visitlog = logging.getLogger('visited')
+extractlog = logging.getLogger('extracted')
 
 def rank_link(link):
     rank = 0 # the higher the rank, the greater the priority to crawl 
@@ -107,6 +108,12 @@ def get_link_domain(url):
 
     return domain# extra forward slash as per the Library's convention, needed to check if link is in main domain
 
+def count_number_directories(url):
+    num_directories = 0
+    for c in url:
+        if c == "/":
+            num_directories += 1
+
 def crawl(root_domain, authors=[]):
     queue = PriorityQueue()
 
@@ -127,6 +134,7 @@ def crawl(root_domain, authors=[]):
         queue.put(root_domain) # otherwise, just traverse the whole library
 
     visited = []
+    extracted = []
 
     while not queue.empty():  
         url = queue.get()
@@ -134,11 +142,14 @@ def crawl(root_domain, authors=[]):
         try:
             req = request.urlopen(url)
             html = req.read()
+
             visited.append(url)
             visitlog.debug(url)
             
+            links_on_page = parse_links_sorted(url, html)
             links_added_to_queue = [] # prevents repeat links from being added 
-            for link, title in parse_links_sorted(url, html):
+
+            for link, title in links_on_page:
 
               if link not in links_added_to_queue:
                 if link not in visited:
@@ -148,18 +159,34 @@ def crawl(root_domain, authors=[]):
                         
                         links_added_to_queue.append(link) 
                         queue.put(link)
+                    
+            if len(links_added_to_queue) == 0:
+                for ex in extract_information(url, html):
+                    extractlog.debug(ex)
+                    extracted.append(ex)
 
         except Exception as e:
             print(e, url)
 
     return visited
 
-def main():
-    authors = ['Cicero']
-    crawl("https://www.thelatinlibrary.com", authors) # to test crawler, otherwise, crawl imported by processor
+def extract_information(address, html):
+    soup = BeautifulSoup(html, 'html.parser')
+    results = []
 
-    # NB, html, shtml, ...
-    # NB, toLowercase()
+    for paragraph in soup.find_all('p'):
+        if paragraph.get('class') == None: # check that it is not internal navigation
+            if len(paragraph.find_all('a')) <= 1: # indicates chapter of book
+                text = paragraph.getText()
+                results.append(text)
+
+    print(results)
+    return results
+
+def main():
+    authors = ['Cicero', 'Caesar', 'Catullus']
+    crawl("https://www.thelatinlibrary.com", authors) # to test crawler, otherwise, crawl imported by processor
+    # TODO: rank_link?
 
 if __name__ == '__main__':
     main()
