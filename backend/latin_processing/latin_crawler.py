@@ -4,6 +4,36 @@ from queue import PriorityQueue
 from urllib import request, parse
 from bs4 import BeautifulSoup
 
+html_naming_conventions = {
+    'Augustus': 'aug',
+    'Aurelius Victor': 'victor',
+    'Caesar': 'caes',
+    'Cicero': 'cic',
+    'Curtius Rufus': 'curtius',
+    'Ennius': 'enn',
+    'Historia Augusta': 'sha',
+    'Horace': 'hor',
+    'Livy': 'liv',
+    'Pliny Maior': 'pliny1',
+    'Pliny Minor': 'pliny',
+    'Propertius': 'prop',
+    'Sallust': 'sall',
+    'Seneca Maior': 'seneca',
+    'Seneca Minor': 'sen',
+    'Silius Italicus': 'silius',
+    'Suetonius': 'suet',
+    'Tacitus': 'tac',
+    'Terence': 'ter',
+    'Tibullus': 'tib',
+    'Valerius Flaccus': 'valeriusflaccus',
+    'Valerius Maximus': 'valmax',
+    'Velleius': 'vell',
+    'Vergil': 'verg',
+    'Ius Romanum': 'ius',
+    'Miscellany': 'misc',
+    'Neo-Latin': 'neo'
+}
+
 logging.basicConfig(level=logging.DEBUG, filename='output.log', filemode='w')
 visitlog = logging.getLogger('visited')
 
@@ -81,10 +111,28 @@ def get_link_domain(url):
 
     return domain# extra forward slash as per the Library's convention, needed to check if link is in main domain
 
-def crawl(root_domain):
-
+def crawl(root_domain, authors=[]):
     queue = PriorityQueue()
-    queue.put(root_domain)
+
+    if len(authors) != 0: # if the user specified an author, alter root domain to just traverse those authors's works
+        for author in authors:
+            link_to_traverse = ""
+
+            if author in html_naming_conventions: # for authors with special naming conventions in library
+                link_to_traverse += root_domain + "/" + html_naming_conventions[author]
+            else:
+                link_to_traverse += root_domain + "/" + author.lower() # standard naming convention (e.g., for people with short names)
+
+            if author == "Catullus": # Catullus is only author with shtml formatting
+                queue.put(link_to_traverse + ".shtml") 
+            else:
+                queue.put(link_to_traverse + ".html")
+    else:
+        queue.put(root_domain) # otherwise, just traverse the whole library
+
+    while not queue.empty():
+        print(queue.get())
+    exit()
 
     visited = []
 
@@ -111,11 +159,17 @@ def crawl(root_domain):
 
         except Exception as e:
             print(e, url)
+
+        exit()
     
     return visited
 
 def main():
-    crawl("https://www.thelatinlibrary.com")
+    authors = ['Catullus', 'Cicero']
+    crawl("https://www.thelatinlibrary.com", authors) # to test crawler, otherwise, crawl imported by processor
+
+    # NB, html, shtml, ...
+    # NB, toLowercase()
 
 if __name__ == '__main__':
     main()
