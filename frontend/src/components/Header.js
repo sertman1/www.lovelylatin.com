@@ -55,7 +55,7 @@ function Header(props) {
         }}
       >
 
-        <b>Search the works of dozens of Latin authors or explore <i>The Great Beyonds...</i></b>
+        <b>Search the works of dozens of Latin authors or explore <i>The Great Beyonds</i>...</b>
 
       </div>
     )
