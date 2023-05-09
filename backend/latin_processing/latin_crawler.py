@@ -44,18 +44,14 @@ def rank_link(link):
 
     return rank
 
-def is_self_referencing(link, original_link):
-    num_directories_link = 0
-    num_directories_original = 0
-    for c in link:
-        if c == "/":
-            num_directories_link += 1
-      
-    for c in original_link:
-        if c == "/":
-            num_directories_original += 1
+def is_self_referencing(link): # self referencing links in library are denoted with '#' and always in the innermost directory
+    i = len(link) - 1
+    while link[i] != '/':
+        if link[i] == '#':
+            return True
+        i -= 1
 
-    return num_directories_link == num_directories_original
+    return False
 
 def parse_links_sorted(root, html):
     urls = []
@@ -130,10 +126,6 @@ def crawl(root_domain, authors=[]):
     else:
         queue.put(root_domain) # otherwise, just traverse the whole library
 
-    while not queue.empty():
-        print(queue.get())
-    exit()
-
     visited = []
 
     while not queue.empty():  
@@ -151,7 +143,7 @@ def crawl(root_domain, authors=[]):
               if link not in links_added_to_queue:
                 if link not in visited:
                   
-                  if not is_self_referencing(link, url):
+                  if not is_self_referencing(link):
                     if get_link_domain(link) == strip_www(strip_http_request(root_domain)): # only crawl TheLatinLibrary itself
                         
                         links_added_to_queue.append(link) 
@@ -160,12 +152,10 @@ def crawl(root_domain, authors=[]):
         except Exception as e:
             print(e, url)
 
-        exit()
-    
     return visited
 
 def main():
-    authors = ['Catullus', 'Cicero']
+    authors = ['Cicero']
     crawl("https://www.thelatinlibrary.com", authors) # to test crawler, otherwise, crawl imported by processor
 
     # NB, html, shtml, ...
