@@ -35,6 +35,11 @@ html_naming_conventions = {
     'Miscellany': 'misc',
     'Neo-Latin': 'neo'
 }
+# list of bad links on the library NOT TO TRAVERSE (english/teaching materials)
+bad_links = ["ll1/", "ll2/", "caes/", "catullus/", "satire/", "sallust/", "livius/", 
+             "cic/", "virgil/", "historians/", "imperialism/syllabus.html", "law/",
+             "/index.html", "/classics.html", "index.html", "classics.html", "cred.html"]
+
 
 logging.basicConfig(level=logging.DEBUG, filename='output.log', filemode='w')
 visitlog = logging.getLogger('visited')
@@ -60,7 +65,7 @@ def parse_links_sorted(root, html, get_all_homelinks):
 
     for link in soup.find_all('a'):
         href = link.get('href')
-        if href and (href == "cred.html" or href =="/index.html" or href == "/classics.html" or href =="index.html" or href == "classics.html"):
+        if href and href in bad_links:
             break # short circuit to prevent crawler from reading credits, teaching materials etc. and also from going back into the library's home page
         if href:
             text = link.string
