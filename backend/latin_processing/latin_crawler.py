@@ -3,6 +3,7 @@ import logging
 from queue import PriorityQueue
 from urllib import request, parse
 from bs4 import BeautifulSoup
+import csv
 
 html_naming_conventions = {
     'Augustus': 'aug',
@@ -114,6 +115,25 @@ def count_number_directories(url):
         if c == "/":
             num_directories += 1
 
+def get_author_name_from_workpage(url):
+    url = strip_http_request(url)
+
+    i = 0
+    while url[i] != "/":
+        i += 1
+    i += 1
+    name = ""
+    while i < len(url) and url[i] != "/" :
+        name += url[i]
+        i += 1
+    name.title()
+
+    for key, value in html_naming_conventions.items():
+        if value == "name":
+            return key
+
+    return name.title()
+
 def crawl(root_domain, authors=[]):
     queue = PriorityQueue()
 
@@ -134,14 +154,16 @@ def crawl(root_domain, authors=[]):
         queue.put(root_domain) # otherwise, just traverse the whole library
 
     visited = []
-    extracted = []
+    extracted_works = {} # maps authors to (work, title) pairs and to be returned to main processing script for vector modeling
 
     while not queue.empty():  
         url = queue.get()
-
+        
         try:
             req = request.urlopen(url)
             html = req.read()
+
+            author = get_author_name_from_workpage(url)
 
             visited.append(url)
             visitlog.debug(url)
@@ -161,27 +183,34 @@ def crawl(root_domain, authors=[]):
                         queue.put(link)
                     
             if len(links_added_to_queue) == 0:
-                for ex in extract_information(url, html):
+                for ex in extract_information(url, html, author):
                     extractlog.debug(ex)
-                    extracted.append(ex)
+                    extracted_works[author] = ex
 
         except Exception as e:
             print(e, url)
 
     return visited
 
-def extract_information(address, html):
+def extract_information(address, html, author):
     soup = BeautifulSoup(html, 'html.parser')
-    results = []
+   
+    title = ""  # title of work and corresponding text to be returned
+    text = "" 
+
+    for header in soup.find_all('h1'):
+        title = header.getText()
 
     for paragraph in soup.find_all('p'):
         if paragraph.get('class') == None: # check that it is not internal navigation
-            if len(paragraph.find_all('a')) <= 1: # indicates chapter of book
-                text = paragraph.getText()
-                results.append(text)
+            add_section = True
+            for section in paragraph.find_all('a'): # check for footer
+                if section.getText() == "The Latin Library" or section.getText() == "The Classics Page" or section.getText() == author:
+                    add_section = False
+            if add_section:
+                text += paragraph.getText()
 
-    print(results)
-    return results
+    return (title, text)
 
 def main():
     authors = ['Cicero', 'Caesar', 'Catullus']
