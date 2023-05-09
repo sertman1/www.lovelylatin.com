@@ -190,7 +190,7 @@ def crawl(root_domain, authors=[]):
         except Exception as e:
             print(e, url)
 
-    return visited
+    return extracted_works
 
 def extract_information(address, html, author):
     soup = BeautifulSoup(html, 'html.parser')
@@ -212,10 +212,17 @@ def extract_information(address, html, author):
 
     return (title, text)
 
+def write_to_csv(dict):
+    field_names = ['Author', 'Work', 'Text']
+    with open('extracted_texts.csv', 'w') as f:
+        for key in dict.keys():
+            f.write("%s,%s,\n"%(key, dict[key]))
+
 def main():
     authors = ['Cicero', 'Caesar', 'Catullus']
-    crawl("https://www.thelatinlibrary.com", authors) # to test crawler, otherwise, crawl imported by processor
+    extracted_works = crawl("https://www.thelatinlibrary.com", authors) # to test crawler, otherwise, crawl imported by processor
     # TODO: rank_link?
+    write_to_csv(extracted_works)
 
 if __name__ == '__main__':
     main()
