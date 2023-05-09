@@ -53,7 +53,7 @@ def is_self_referencing(link): # self referencing links in library are denoted w
 
     return False
 
-def parse_links_sorted(root, html):
+def parse_links_sorted(root, html, get_all_homelinks):
     urls = []
 
     soup = BeautifulSoup(html, 'html.parser')
@@ -146,7 +146,7 @@ def crawl(root_domain, authors=[]):
             else:
                 link_to_traverse += root_domain + "/" + author.lower() # standard naming convention (e.g., for people with short names)
 
-            if author == "Catullus": # Catullus is only author with shtml formatting
+            if author == "Catullus" or author == "Gellius": # Catullus, Gellius are only author with shtml formatting
                 queue.put(link_to_traverse + ".shtml") 
             else:
                 queue.put(link_to_traverse + ".html")
@@ -158,22 +158,25 @@ def crawl(root_domain, authors=[]):
     
     while not queue.empty():  
         url = queue.get()
-        
+        if url == "https://www.thelatinlibrary.com/christian" or url == "https://www.thelatinlibrary.com/medieval" or url == "https://www.thelatinlibrary.com/ius":
+            url += ".html" # fixing broken link on page
+
         try:
             req = request.urlopen(url)
             html = req.read()
 
             if not get_all_home_links: # i.e., if we are not on the homepage and thus on an author's profile
-                author = get_author_name_from_workpage(url)
+                # check for special url cases which open two a "2nd homepage"
+                if url != "https://www.thelatinlibrary.com/christian.html" or url != "https://www.thelatinlibrary.com/medieval.html" or url != "https://www.thelatinlibrary.com/neo.html":
+                    author = get_author_name_from_workpage(url)
 
             visited.append(url)
             visitlog.debug(url)
             
-            links_on_page = parse_links_sorted(url, html)
+            links_on_page = parse_links_sorted(url, html, get_all_home_links)
             links_added_to_queue = [] # prevents repeat links from being added 
 
             for link, title in links_on_page:
-
               if link not in links_added_to_queue:
                 if link not in visited:
                   
