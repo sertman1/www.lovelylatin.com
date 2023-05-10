@@ -86,7 +86,7 @@ function App() {
     } else {
       return (
         <div>
-          <TextField fullWidth label="Enter your Latin text or keywords (e.g. faba Pythagoras)"
+          <TextField fullWidth label="Enter your Latin text or keywords (e.g. faba pythagoras)"
             id="fullWidth"
             margin="normal"
             onChange={handelOnChange}

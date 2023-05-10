@@ -74,7 +74,7 @@ function Header(props) {
       <div style={{marginTop: 30}}>
         <div style={{marginBottom: 5}}>
         <FormControl fullWidth={true}>
-          <InputLabel id="authors-label" size="small">Select Latin authors</InputLabel>
+          <InputLabel id="authors-label" size="small">Select authors</InputLabel>
           <Select
             size="small"
             labelId="authors-label"
@@ -82,7 +82,7 @@ function Header(props) {
             multiple
             value={authorsSelected}
             onChange={handleChange}
-            input={<OutlinedInput id="select-multiple-chip" label="Select Latin authors"/>}
+            input={<OutlinedInput id="select-multiple-chip" label="Select authors"/>}
             renderValue={(selected) => (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                 {selected.map((value) => (
