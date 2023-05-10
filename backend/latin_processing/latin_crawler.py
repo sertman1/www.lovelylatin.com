@@ -164,35 +164,36 @@ def crawl(root_domain, authors=[]):
         if url == "https://www.thelatinlibrary.com/christian" or url == "https://www.thelatinlibrary.com/medieval" or url == "https://www.thelatinlibrary.com/ius":
             url += ".html" # fixing broken link on page
 
-        try:
-            req = request.urlopen(url)
-            html = req.read()
+        if url not in visited:
+            try:
+                req = request.urlopen(url)
+                html = req.read()
 
-            author = get_author_name_from_workpage(url)
+                author = get_author_name_from_workpage(url)
 
-            visited.append(url)
-            visitlog.debug(url)
-            
-            links_on_page = parse_links_sorted(url, html)
-            links_added_to_queue = [] # prevents repeat links from being added 
+                visited.append(url)
+                visitlog.debug(url)
+                
+                links_on_page = parse_links_sorted(url, html)
+                links_added_to_queue = [] # prevents repeat links from being added 
 
-            for link, title in links_on_page:
-              if link not in links_added_to_queue:
-                if link not in visited:
-                  
-                  if not is_self_referencing(link):
-                    if get_link_domain(link) == strip_www(strip_http_request(root_domain)): # only crawl TheLatinLibrary itself
-                        
-                        links_added_to_queue.append(link) 
-                        queue.put(link)
+                for link, title in links_on_page:
+                    if link not in links_added_to_queue:
+                        if link not in visited:
+                            if not is_self_referencing(link):
+                                if get_link_domain(link) == strip_www(strip_http_request(root_domain)): # only crawl TheLatinLibrary itself
+                                    
+                                    links_added_to_queue.append(link) 
+                                    queue.put(link)
 
-            if len(links_added_to_queue) == 0:
-                extract_information(url, html, author)
+                if len(links_added_to_queue) == 0:
+                    extract_information(url, html, author)
 
 
-        except Exception as e:
-            print(e, url)
+            except Exception as e:
+                print(e, url)
 
+    write_to_csv(extracted_works)
     return extracted_works
 
 def extract_information(address, html, author):
@@ -217,7 +218,6 @@ def extract_information(address, html, author):
         extracted_works[author] = dict()
 
     (extracted_works[author])[title] = text
-    write_to_csv(extracted_works)
 
 def write_to_csv(dict):
     with open('extracted_texts.csv', 'w') as f:

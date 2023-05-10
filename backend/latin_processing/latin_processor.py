@@ -24,6 +24,12 @@ def remove_stopwords(tokens):
 
     return pruned_sentence
 
+def process_extracted_texts(extracted_texts):
+    for author in extracted_texts.keys():
+        print(author)
+    return  
+
+
 ###### GENERAL NOTES / CONSIDERATIONS FOR FUTURE IMPLEMENTATIONS
     # pre compute index of terms to documents (book, page level, section, etc.)
     # DRAW IT OUT FOR WRITE UP:
@@ -38,6 +44,7 @@ def process_query(query, authors_selected):
 
     # get appropriate text from library given authors selected 
     extracted_texts = crawl("https://www.thelatinlibrary.com", authors_selected)
+    process_extracted_texts(extracted_texts)
 
     # process query
     tokens = remove_stopwords(word_tokenize(query))
