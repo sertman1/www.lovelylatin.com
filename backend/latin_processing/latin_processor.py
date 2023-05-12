@@ -52,15 +52,25 @@ def compute_similarities(query_vec, doc_vecs):
 
     return sorted(similarities, reverse=True)
 
-stopwords = word_tokenize("ac adhic an at atque aut autem cum cur de deinde dum enim et etiam etsi ex haud hic hoc iam igitur interim ita itaque magis modo nam ne nec necque neque nisi non quae quam quare quia quicumque quidem quilibet quis quisnam quisquam quisque quisquis quo quoniam sed si nisi sic sive tam tamen tum ubi uel vel uero vero ut")
+stopwords = word_tokenize("ac adhic an at atque aut autem cum cur de deinde dum enim et etiam etsi ex haud hic hoc iam igitur interim ita itaque magis modo nam ne nec necque neque nisi non quae quam quare quia quicumque quidem quilibet quis quisnam quisquam quisque quisquis quo quoniam sed si nisi sic sive tam tamen tum ubi uel vel uero vero ut . , ; : [ ] < > ?")
 
 def remove_stopwords(tokens):
     pruned_sentence = list()
     for word in tokens:
-        if word not in stopwords:
+        if word not in stopwords and not word.isnumeric():
             pruned_sentence.append(word)
 
     return pruned_sentence
+
+def add_base_form_to_tokens(tokens):
+    expanded_tokens = []
+    for token in tokens:
+        expanded_tokens.append(token)
+        if token in inflected_form_to_base_form:
+            expanded_tokens.append(inflected_form_to_base_form[token])
+
+    return expanded_tokens
+    
 
 inverted_file = {}
 def process_extracted_docs(extracted_texts):
@@ -71,6 +81,7 @@ def process_extracted_docs(extracted_texts):
         for title_of_work in extracted_texts[author]:
             works_text = (extracted_texts[author])[title_of_work]
             works_text = remove_stopwords(word_tokenize(works_text.lower()))
+            works_text = add_base_form_to_tokens(works_text)
             doc = Document(i, works_text, author, title_of_work)
             docs.append(doc)
             inverted_file[i] = doc

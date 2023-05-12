@@ -2,6 +2,7 @@ def process_unimorph_file():
     inflected_form_to_base_form = {}
 
     f = open('./latin_processing/lat.txt', 'r')
+
     for line in f.readlines():
         base_form = ""
         inflected_form = ""
