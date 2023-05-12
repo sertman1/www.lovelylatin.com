@@ -40,7 +40,7 @@ function App() {
       const data = response.data
       setOutput(data)
     } catch (err) {
-      alert('err')
+      alert('Eheu! All apologies, our sever is down...')
       console.log(err)
     }
     return

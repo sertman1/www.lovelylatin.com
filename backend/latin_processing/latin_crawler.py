@@ -39,9 +39,9 @@ bad_links = ["ll1/", "ll2/", "caes/", "catullus/", "satire/", "sallust/", "liviu
              "/index.html", "/classics.html", "index.html", "classics.html", "cred.html"]
 
 ### For testing/debugging purposes; cf main crawl loop for commented out 'visitlog.debug(url)'
-#import logging
-#logging.basicConfig(level=logging.DEBUG, filename='output.log', filemode='w')
-#visitlog = logging.getLogger('visited')
+import logging
+logging.basicConfig(level=logging.DEBUG, filename='output.log', filemode='w')
+visitlog = logging.getLogger('visited')
 
 def rank_link(link):
     rank = 0 # the higher the rank, the greater the priority to crawl 
@@ -156,19 +156,20 @@ def crawl(root_domain, authors=[]):
     else:
         queue.put(root_domain) # otherwise, just traverse the whole library
         
-    visited = []
+    visited = ["https://www.thelatinlibrary.com/78b"] # bad link embedded somewhere on the page; not to be travered
     
     while not queue.empty():  
         url = queue.get()
         if url == "https://www.thelatinlibrary.com/christian" or url == "https://www.thelatinlibrary.com/medieval" or url == "https://www.thelatinlibrary.com/ius":
             url += ".html" # fixing broken link on page
-
         if url not in visited:
             try:
                 req = request.urlopen(url)
                 html = req.read()
 
                 author = get_author_name_from_workpage(url)
+                if author == "Resgestae.Html" or author == "Resgestae1.Html": # handle special augustuc case
+                    author = "Augustus"
 
                 visited.append(url)
                 # for testing/debugging
@@ -194,7 +195,7 @@ def crawl(root_domain, authors=[]):
                 print(e, url)
 
     # for debugging purposes
-    #write_to_csv(extracted_works)
+    write_to_csv(extracted_works)
     return extracted_works
 
 def extract_information(address, html, author):
@@ -203,8 +204,13 @@ def extract_information(address, html, author):
     title = ""  # title of work and corresponding text to be returned
     text = "" 
 
-    for header in soup.find_all('h1'):
-        title = header.getText() 
+    for title_tag in soup.find_all('title'):
+        title = title_tag.getText()
+
+    ### some documents may have poor formatting and not include title tag --> use other means
+    if title == "":
+        for header in soup.find_all('h1'):
+            title = header.getText() 
     if title == "": # check if title was not denoted by <h1> tag but rather class="pagehead
         title = soup.find('p', {'class': 'pagehead'}).getText() # header takes prominence
 
@@ -220,6 +226,8 @@ def extract_information(address, html, author):
     if author not in extracted_works:
         extracted_works[author] = dict()
 
+    print(title)
+
     (extracted_works[author])[title] = text
 
 def write_to_csv(dict): # to check the success of crawler's extraction
@@ -228,7 +236,7 @@ def write_to_csv(dict): # to check the success of crawler's extraction
             f.write("%s,%s,\n"%(key, dict[key]))
 
 def main():
-    authors = ['Cicero'] # to test crawler, otherwise, crawl imported and handled by processor
+    authors = [] # to test crawler, otherwise, crawl imported and handled by processor
     crawl("https://www.thelatinlibrary.com", authors) # populates extracted_works
     # TODO: rank_link?
     print(len(extracted_works['Cicero']))
