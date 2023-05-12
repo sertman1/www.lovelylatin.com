@@ -203,7 +203,9 @@ def extract_information(address, html, author):
     text = "" 
 
     for header in soup.find_all('h1'):
-        title = header.getText()
+        title = header.getText() 
+    if title == "": # check if title was not denoted by <h1> tag but rather class="pagehead
+        title = soup.find('p', {'class': 'pagehead'}).getText() # header takes prominence
 
     for paragraph in soup.find_all('p'):
         if paragraph.get('class') == None: # check that it is not internal navigation
@@ -225,9 +227,10 @@ def write_to_csv(dict):
             f.write("%s,%s,\n"%(key, dict[key]))
 
 def main():
-    authors = [] # to test crawler, otherwise, crawl imported and handled by processor
+    authors = ['Cicero'] # to test crawler, otherwise, crawl imported and handled by processor
     crawl("https://www.thelatinlibrary.com", authors) # populates extracted_works
     # TODO: rank_link?
+    print(len(extracted_works['Cicero']))
 
 if __name__ == '__main__':
     main()
