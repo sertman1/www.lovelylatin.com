@@ -79,10 +79,11 @@ def process_extracted_docs(extracted_texts):
     i = 0 # documents to be indexed by i
     for author in extracted_texts.keys():
         for title_of_work in extracted_texts[author]:
-            works_text = (extracted_texts[author])[title_of_work]
+            works_text = ((extracted_texts[author])[title_of_work])[0]
             works_text = remove_stopwords(word_tokenize(works_text.lower()))
             works_text = add_base_form_to_tokens(works_text)
-            doc = Document(i, works_text, author, title_of_work)
+            works_url = ((extracted_texts[author])[title_of_work])[1]
+            doc = Document(i, works_text, author, title_of_work, works_url)
             docs.append(doc)
             inverted_file[i] = doc
             i += 1
@@ -91,7 +92,7 @@ def process_extracted_docs(extracted_texts):
 
 def process_query(query):
     tokens = remove_stopwords(word_tokenize(query))
-    query_doc = Document(-1, tokens, "user", "query") # special field values -1, "user" and "query" distinguish the doc as the query
+    query_doc = Document(-1, tokens, "user", "query", "/") # special field values -1, "user" "query" "/" distinguish the doc as the query
     return query_doc
 
 def process(query, authors_selected):
@@ -113,7 +114,7 @@ def process(query, authors_selected):
 
     i = 1
     for result in ranked_results:
-        report += (inverted_file[result[1]]).title_of_work + "\n"
+        report += (inverted_file[result[1]]).title_of_work +  (inverted_file[result[1]]).url + "\n"
         i += 1
 
     return report

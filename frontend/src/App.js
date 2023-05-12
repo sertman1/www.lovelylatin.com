@@ -1,7 +1,7 @@
 import { useState } from "react"
 import axios from "axios"
 import { TextField, Button, Container, Box, Grid } from "@material-ui/core"
-import { Pagination, Typography, Stack} from "@mui/material";
+import { Stack} from "@mui/material";
 import Header from "./components/Header.js"
 import Footer from "./components/Footer.js"
 import RetrievedText from "./components/RetreivedText.js";
@@ -29,12 +29,19 @@ function App() {
     let ranks = []
 
     let name_of_work = ""
+    let count = 0
     for (let i = 0; i < data.length; i++) {
       if (data[i] !== "\n") { // backend returns works separated by newlines
         name_of_work += data[i]
       } else {
+        let url = ""
+        while (i < data.length && data[i] !== "\n") {
+          url += data[i]
+          i += 1
+        }
+        url.trim()
         if (name_of_work.trim() !== "") {
-          ranks[rank] = name_of_work.trim()
+          ranks[rank] = name_of_work.trim() + url
           name_of_work = ""
           rank += 1
         }
@@ -44,7 +51,7 @@ function App() {
   }
 
   const enter = async () => {
-    if (authorsSelected.length == 0) {
+    if (authorsSelected.length === 0) {
       alert('Please select an author!')
       return
     }
@@ -118,7 +125,7 @@ function App() {
 
     console.log(retrievedTexts)
 
-    if (retrievedTexts.length == 0) {
+    if (retrievedTexts.length === 0) {
       return (<Container maxWidth={false}>
         <Box
           component="span"

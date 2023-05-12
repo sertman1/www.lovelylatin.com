@@ -3,7 +3,7 @@ from queue import PriorityQueue
 from urllib import request, parse
 from bs4 import BeautifulSoup
 
-extracted_works = {} # maps authors to (work, title) pairs and to be returned to main processing script for vector modeling
+extracted_works = {} # maps authors to work: (work_text, and url) and to be returned to main processing script for vector modeling
 html_naming_conventions = {
     'Augustus': 'aug',
     'Aurelius Victor': 'victor',
@@ -230,7 +230,7 @@ def extract_information(address, html, author):
     if author not in extracted_works:
         extracted_works[author] = dict()
 
-    (extracted_works[author])[title] = text
+    (extracted_works[author])[title] = (text, address)
 
 def write_to_csv(dict): # to check the success of crawler's extraction
     with open('extracted_texts.csv', 'w') as f:

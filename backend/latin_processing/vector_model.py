@@ -10,21 +10,19 @@ class Document(NamedTuple):
     terms: List[str]
     author: str
     title_of_work: str
+    url: str
 
     def __repr__(self):
         return (f"doc_id: {self.doc_id}\n" +
             f"  terms: {self.terms}\n" +
             f"  author: {self.author}\n" +
-            f"  title: {self.title_of_work}\n" )
+            f"  title: {self.title_of_work}\n" +
+            f"  url: {self.url}\n")
 
 def compute_doc_freqs(docs: List[Document]):
     freq = Counter()
     for doc in docs:
-        words = set()
-        for sec in doc.sections():
-            for word in sec:
-                words.add(word)
-        for word in words:
+        for word in doc.terms:
             freq[word] += 1
     return freq
 
@@ -46,7 +44,7 @@ def compute_tfidf(doc, doc_freqs, N):
     for word in doc.terms:
         vec[word] += tf[word] * (np.log2((N + 1) / (freq[word] + 1)) + 1)
 
-    return (dict(vec), doc.doc_id)
+    return (dict(vec), doc.doc_id, doc.url)
 
 def vectorize_doc(doc, doc_freqs, N):
     return compute_tfidf(doc, doc_freqs, N)

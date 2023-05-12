@@ -1,9 +1,9 @@
 function RetrievedText(props) {
   const { text, rank } = props
-
+  
   return (
     <div>
-      {rank + ": " + text}
+      {text}
     </div>
   )
 }
