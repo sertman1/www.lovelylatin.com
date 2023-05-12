@@ -3,7 +3,6 @@ import logging
 from queue import PriorityQueue
 from urllib import request, parse
 from bs4 import BeautifulSoup
-import csv
 
 extracted_works = {} # maps authors to (work, title) pairs and to be returned to main processing script for vector modeling
 html_naming_conventions = {
@@ -40,9 +39,9 @@ bad_links = ["ll1/", "ll2/", "caes/", "catullus/", "satire/", "sallust/", "liviu
              "cic/", "virgil/", "historians/", "imperialism/syllabus.html", "law/",
              "/index.html", "/classics.html", "index.html", "classics.html", "cred.html"]
 
-
-logging.basicConfig(level=logging.DEBUG, filename='output.log', filemode='w')
-visitlog = logging.getLogger('visited')
+### For testing/debugging purposes; cf main crawl loop for commented out 'visitlog.debug(url)'
+# logging.basicConfig(level=logging.DEBUG, filename='output.log', filemode='w')
+# visitlog = logging.getLogger('visited')
 
 def rank_link(link):
     rank = 0 # the higher the rank, the greater the priority to crawl 
@@ -172,7 +171,7 @@ def crawl(root_domain, authors=[]):
                 author = get_author_name_from_workpage(url)
 
                 visited.append(url)
-                visitlog.debug(url)
+                # visitlog.debug(url) for testing/debugging
                 
                 links_on_page = parse_links_sorted(url, html)
                 links_added_to_queue = [] # prevents repeat links from being added 
@@ -193,7 +192,7 @@ def crawl(root_domain, authors=[]):
             except Exception as e:
                 print(e, url)
 
-    write_to_csv(extracted_works)
+    # write_to_csv(extracted_works) for debugging purposes
     return extracted_works
 
 def extract_information(address, html, author):
@@ -221,7 +220,7 @@ def extract_information(address, html, author):
 
     (extracted_works[author])[title] = text
 
-def write_to_csv(dict):
+def write_to_csv(dict): # to check the success of crawler's extraction
     with open('extracted_texts.csv', 'w') as f:
         for key in dict.keys():
             f.write("%s,%s,\n"%(key, dict[key]))
