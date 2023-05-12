@@ -18,6 +18,28 @@ function App() {
     setOutput("");
   }
 
+  const process_data = (data) => {
+    let rank = 0
+    let ranks = []
+  
+    console.log(data)
+
+    let name_of_work = ""
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] !== "\n") { // backend returns works separated by newlines
+        name_of_work += data[i]
+      } else {
+        if (name_of_work.trim() !== "") {
+          ranks[rank] = name_of_work.trim()
+          name_of_work = ""
+          rank += 1
+        }
+      }
+    }
+
+    console.log(ranks)
+  }
+
   const enter = async () => {
     if (userInput === "") {
       alert('please enter text!')
@@ -37,7 +59,7 @@ function App() {
             authorsSelected: authorsSelected
         } 
       })
-      const data = response.data
+      const data = process_data(response.data)
       setOutput(data)
     } catch (err) {
       alert('Eheu! All apologies, our sever is down...')

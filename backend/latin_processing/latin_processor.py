@@ -99,7 +99,7 @@ def process(query, authors_selected):
 
     i = 1
     for result in ranked_results:
-        report += str(i) + ": " + (inverted_file[result[1]]).title_of_work + "\n"
+        report += (inverted_file[result[1]]).title_of_work + "\n"
         i += 1
 
     return report
