@@ -1,11 +1,11 @@
-def process_file():
+def process_unimorph_file():
     inflected_form_to_base_form = {}
 
-    f = open('lat.txt', 'r')
+    f = open('./latin_processing/lat.txt', 'r')
     for line in f.readlines():
         base_form = ""
         inflected_form = ""
-        
+
         i = 0
         while line[i] != '\t' and line[i] != " ":
             base_form += line[i]
@@ -18,11 +18,10 @@ def process_file():
           
         inflected_form_to_base_form[inflected_form] = base_form
 
-    print(inflected_form_to_base_form)
     return inflected_form_to_base_form
 
 def main():
-    return process_file()
+    return process_unimorph_file()
 
 if __name__ == '__main__':
     main()

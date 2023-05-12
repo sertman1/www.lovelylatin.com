@@ -3,7 +3,7 @@ const cors = require('cors')
 const app = express();
 app.use(cors())
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5757;
 
 async function process_text(req,res) {
   const { userInput, authorsSelected } = req.query

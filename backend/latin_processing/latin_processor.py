@@ -10,6 +10,9 @@ from numpy.linalg import norm
 ## auxilary scripts to help runtime processing
 from latin_crawler import crawl
 from vector_model import vectorize_doc, Document
+from process_unimorph import process_unimorph_file
+
+inflected_form_to_base_form = process_unimorph_file()
 
 def compute_doc_freqs(docs: List[Document]):
     freq = Counter()

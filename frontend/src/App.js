@@ -4,7 +4,7 @@ import { TextField, Button, Container, Box } from "@material-ui/core"
 import Header from "./components/Header.js"
 import Footer from "./components/Footer.js"
 
-const API = "http://localhost:5000"
+const API = "http://localhost:5757"
 
 function App() {
   const [userInput, setUserInput] = useState("")
