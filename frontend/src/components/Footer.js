@@ -10,7 +10,7 @@ function Footer(props) {
           <a href="https://github.com/sertman1/www.lovelylatin.com">here</a> for source code.
         </p>
         <p>{"A special thanks to "}
-          <a href="https://unimorph.github.io/"> Unimorph</a>
+          <a href="https://github.com/unimorph/lat"> Unimorph</a>
           {" and "} <a href="https://www.thelatinlibrary.com/"> The Latin Library</a>.
         </p>
       </div>
