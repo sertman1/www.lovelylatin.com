@@ -15,7 +15,7 @@ class Document(NamedTuple):
         return (f"doc_id: {self.doc_id}\n" +
             f"  terms: {self.terms}\n" +
             f"  author: {self.author}\n" +
-            f"  title: {self.title_of_work}" )
+            f"  title: {self.title_of_work}\n" )
 
 def compute_doc_freqs(docs: List[Document]):
     freq = Counter()

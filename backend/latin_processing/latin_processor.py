@@ -5,13 +5,11 @@ import sys
 from nltk.tokenize import word_tokenize
 from typing import Dict, List
 from collections import Counter
-import numpy as np
 from numpy.linalg import norm
 
 ## auxilary scripts to help runtime processing
 from latin_crawler import crawl
 from vector_model import vectorize_doc, Document
-
 
 def compute_doc_freqs(docs: List[Document]):
     freq = Counter()
@@ -44,11 +42,12 @@ def compute_similarities(query_vec, doc_vecs):
 
     for doc in doc_vecs:
         sim = cosine_sim(query_vec[0], doc[0])
-        similarities.append((sim, doc[1]))
+        if sim != 0:
+            similarities.append((sim, doc[1]))
 
     similarities = sorted(similarities)
 
-    return sorted(similarities)
+    return sorted(similarities, reverse=True)
 
 stopwords = word_tokenize("ac adhic an at atque aut autem cum cur de deinde dum enim et etiam etsi ex haud hic hoc iam igitur interim ita itaque magis modo nam ne nec necque neque nisi non quae quam quare quia quicumque quidem quilibet quis quisnam quisquam quisque quisquis quo quoniam sed si nisi sic sive tam tamen tum ubi uel vel uero vero ut")
 
@@ -60,6 +59,7 @@ def remove_stopwords(tokens):
 
     return pruned_sentence
 
+inverted_file = {}
 def process_extracted_docs(extracted_texts):
     docs = []
 
@@ -67,9 +67,10 @@ def process_extracted_docs(extracted_texts):
     for author in extracted_texts.keys():
         for title_of_work in extracted_texts[author]:
             works_text = (extracted_texts[author])[title_of_work]
-            works_text = remove_stopwords(word_tokenize(works_text))
+            works_text = remove_stopwords(word_tokenize(works_text.lower()))
             doc = Document(i, works_text, author, title_of_work)
             docs.append(doc)
+            inverted_file[i] = doc
             i += 1
     
     return docs, i + 1 # the latter tells us the value of N: number of documents (+1 for index offset of i = 0)
@@ -83,7 +84,7 @@ def process(query, authors_selected):
     report = ""
     extracted_texts = crawl("https://www.thelatinlibrary.com", authors_selected)
 
-    query_doc = process_query(query)
+    query_doc = process_query(query.lower())
     text_docs, N = process_extracted_docs(extracted_texts)
     
     doc_freqs = compute_doc_freqs(text_docs)
@@ -95,6 +96,11 @@ def process(query, authors_selected):
         doc_vecs.append(vectorize_doc(doc, doc_freqs, N))
 
     ranked_results = compute_similarities(query_vec, doc_vecs)
+
+    i = 1
+    for result in ranked_results:
+        report += str(i) + ": " + (inverted_file[result[1]]).title_of_work + "\n"
+        i += 1
 
     return report
 
