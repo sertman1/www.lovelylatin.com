@@ -21,7 +21,7 @@ function App() {
     setUserInput(""); 
     setOutput("");
     setDocsRetrieved(false)
-    retrievedTexts([])
+    setRetrievedTexts([])
   }
 
   const process_data = (data) => {
@@ -94,7 +94,7 @@ function App() {
 
   const showRetrievedTexts = () => {
     if (!docsRetrieved) {
-      return (<div>
+      return (<Container maxWidth={false}>
         <Box
           component="span"
           sx={{
@@ -109,30 +109,33 @@ function App() {
           }}>
           {output}
         </Box>
-      </div>)
+      </Container>)
     }
 
-    return (<Box
-      component="span"
-      sx={{
-        whiteSpace: 'normal',
-        display: 'block',
-        p: 1,
-        mb: 1,
-        bgcolor: 'white',
-        color: 'grey.300',
-        border: '1px solid',
-        borderColor: 'grey.800',
-      }}>
-      <Grid>
-        {retrievedTexts.map((text, index) => {
-          if (text !== "The Latin Library")
-            return (
-              <div>{index + 1 + ": " + text}</div>
-            )
-        })}
-      </Grid>
-    </Box>)
+    return (
+    <Container maxWidth={false}>
+      <Box
+        component="span"
+        sx={{
+          whiteSpace: 'normal',
+          display: 'block',
+          p: 1,
+          mb: 1,
+          bgcolor: 'white',
+          color: 'grey.300',
+          border: '1px solid',
+          borderColor: 'grey.800',
+        }}>
+        <Grid>
+          {retrievedTexts.map((text, index) => {
+            if (text !== "The Latin Library")
+              return (
+                <RetrievedText rank={index + 1} text={text}></RetrievedText>
+              )
+          })}
+        </Grid>
+      </Box>
+    </Container>)
   }
 
   const showOptions = () => {
@@ -141,7 +144,6 @@ function App() {
         <div>
           <Grid
           container
-          justifyContent="center"
           >
             {showRetrievedTexts()}
           </Grid>
