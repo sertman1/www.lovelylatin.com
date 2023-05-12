@@ -170,6 +170,8 @@ def crawl(root_domain, authors=[]):
                 author = get_author_name_from_workpage(url)
                 if author == "Resgestae.Html" or author == "Resgestae1.Html": # handle special augustuc case
                     author = "Augustus"
+                elif author == "Catullus.Shtml":
+                    author = "Catullus"
 
                 visited.append(url)
                 # for testing/debugging
