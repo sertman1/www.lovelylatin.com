@@ -46,7 +46,7 @@ def compute_tfidf(doc, doc_freqs, N):
     for word in doc.terms:
         vec[word] += tf[word] * (np.log2((N + 1) / (freq[word] + 1)) + 1)
 
-    return dict(vec)
+    return (dict(vec), doc.doc_id)
 
 def vectorize_doc(doc, doc_freqs, N):
     return compute_tfidf(doc, doc_freqs, N)
