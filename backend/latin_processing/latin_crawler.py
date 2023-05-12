@@ -1,5 +1,4 @@
 import re
-import logging
 from queue import PriorityQueue
 from urllib import request, parse
 from bs4 import BeautifulSoup
@@ -40,12 +39,13 @@ bad_links = ["ll1/", "ll2/", "caes/", "catullus/", "satire/", "sallust/", "liviu
              "/index.html", "/classics.html", "index.html", "classics.html", "cred.html"]
 
 ### For testing/debugging purposes; cf main crawl loop for commented out 'visitlog.debug(url)'
-# logging.basicConfig(level=logging.DEBUG, filename='output.log', filemode='w')
-# visitlog = logging.getLogger('visited')
+#import logging
+#logging.basicConfig(level=logging.DEBUG, filename='output.log', filemode='w')
+#visitlog = logging.getLogger('visited')
 
 def rank_link(link):
     rank = 0 # the higher the rank, the greater the priority to crawl 
-
+    # TODO: implement (e.g., Cicero takes prominence..?)
     return rank
 
 def is_self_referencing(link): # self referencing links in library are denoted with '#' and always in the innermost directory
@@ -171,7 +171,8 @@ def crawl(root_domain, authors=[]):
                 author = get_author_name_from_workpage(url)
 
                 visited.append(url)
-                # visitlog.debug(url) for testing/debugging
+                # for testing/debugging
+                visitlog.debug(url)
                 
                 links_on_page = parse_links_sorted(url, html)
                 links_added_to_queue = [] # prevents repeat links from being added 
@@ -192,7 +193,8 @@ def crawl(root_domain, authors=[]):
             except Exception as e:
                 print(e, url)
 
-    # write_to_csv(extracted_works) for debugging purposes
+    # for debugging purposes
+    #write_to_csv(extracted_works)
     return extracted_works
 
 def extract_information(address, html, author):
