@@ -3,22 +3,21 @@
 import sys
 from nltk.tokenize import word_tokenize
 from typing import NamedTuple, List
+from collections import Counter
 
 ## auxilary scripts to help runtime processing
 from latin_crawler import crawl
-from vector_model import vectorize_doc
+from vector_model import vectorize_doc, Document
 
-class Document(NamedTuple):
-    doc_id: int # NB data files index starting from 1
-    sentence: List[str]
-    author: str
-    title_of_work: str
-
-    def __repr__(self):
-        return (f"doc_id: {self.doc_id}\n" +
-            f"  sentence: {self.sentence}\n" +
-            f"  author: {self.author}\n" +
-            f"  title: {self.title_of_work}\n")
+def compute_doc_freqs(docs: List[Document]):
+    freq = Counter()
+    for doc in docs:
+        words = set()
+        for term in doc.terms:
+            words.add(term)
+        for word in words:
+            freq[word] += 1
+    return freq
 
 stopwords = word_tokenize("ac adhic an at atque aut autem cum cur de deinde dum enim et etiam etsi ex haud hic hoc iam igitur interim ita itaque magis modo nam ne nec necque neque nisi non quae quam quare quia quicumque quidem quilibet quis quisnam quisquam quisque quisquis quo quoniam sed si nisi sic sive tam tamen tum ubi uel vel uero vero ut")
 
@@ -41,7 +40,7 @@ def process_extracted_docs(extracted_texts):
             doc = Document(i, works_text, author, title_of_work)
             docs.append(doc)
     
-    return docs
+    return docs, i + 1 # the latter tells us the value of N: number of documents (+1 for index offset of i = 0)
 
 def process_query(query):
     tokens = remove_stopwords(word_tokenize(query))
@@ -53,9 +52,14 @@ def process(query, authors_selected):
     extracted_texts = crawl("https://www.thelatinlibrary.com", authors_selected)
 
     query_doc = process_query(query)
-    text_docs = process_extracted_docs(extracted_texts)
+    text_docs, N = process_extracted_docs(extracted_texts)
+    
+    doc_freqs = compute_doc_freqs(text_docs)
 
-    #query_vec = vectorize_doc(query)
+    query_vec = vectorize_doc(query_doc, doc_freqs, N)
+    doc_vecs = []
+    for doc in text_docs:
+        doc_vecs.append(vectorize_doc(doc, doc_freqs, N))
 
     return report
 
