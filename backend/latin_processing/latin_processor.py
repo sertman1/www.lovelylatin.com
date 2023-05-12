@@ -2,19 +2,25 @@
 # it processes the user's query and returns pertinent data to stdout (print)
 import sys
 from nltk.tokenize import word_tokenize
+from typing import NamedTuple, List
 
 ## auxilary scripts to help runtime processing
 from latin_crawler import crawl
+from vector_model import vectorize_doc
 
-### Weighting considerations:
+class Document(NamedTuple):
+    doc_id: int # NB data files index starting from 1
+    sentence: List[str]
+    author: str
+    title_of_work: str
 
-# prepositional phrases as a singular unit
-# query expansion through lemmas
-# position of words relative to one another: same clause, sentence, paragraph, section, chapter, book...?
-# clearly some sort of inverse term document frequency to water down overused terms
-# n-gram model seems strong but dubious due to nonstandardized word ordering
+    def __repr__(self):
+        return (f"doc_id: {self.doc_id}\n" +
+            f"  sentence: {self.sentence}\n" +
+            f"  author: {self.author}\n" +
+            f"  title: {self.title_of_work}\n")
 
-stopwords = word_tokenize("ac adhic an at atque aut autem cum cur de deinde dum enim et etiam etsi ex haud hic hoc iam igitur interim ita itaque magis modo nam ne nec necque neque nisi non quae quam quare quia quicumque quidem quilibet quis quisnam quisquam quisque quisquis quo quoniam sed si nisi sic sive tam tamen tum ubi uel uero ut")
+stopwords = word_tokenize("ac adhic an at atque aut autem cum cur de deinde dum enim et etiam etsi ex haud hic hoc iam igitur interim ita itaque magis modo nam ne nec necque neque nisi non quae quam quare quia quicumque quidem quilibet quis quisnam quisquam quisque quisquis quo quoniam sed si nisi sic sive tam tamen tum ubi uel vel uero vero ut")
 
 def remove_stopwords(tokens):
     pruned_sentence = list()
@@ -24,30 +30,32 @@ def remove_stopwords(tokens):
 
     return pruned_sentence
 
-def process_extracted_texts(extracted_texts):
+def process_extracted_docs(extracted_texts):
+    docs = []
+
+    i = 0 # documents to be indexed by i
     for author in extracted_texts.keys():
-        print(author)
-    return  
+        for title_of_work in extracted_texts[author]:
+            works_text = (extracted_texts[author])[title_of_work]
+            works_text = remove_stopwords(word_tokenize(works_text))
+            doc = Document(i, works_text, author, title_of_work)
+            docs.append(doc)
+    
+    return docs
 
-
-###### GENERAL NOTES / CONSIDERATIONS FOR FUTURE IMPLEMENTATIONS
-    # pre compute index of terms to documents (book, page level, section, etc.)
-    # DRAW IT OUT FOR WRITE UP:
-        # TERM INDEXES TO SECTION TO CHAPTER TO WORK TO AUHTOR
-
-    # NB: can crawl common queries (vectors) while offline so answers are quickly found
-    # NB: can include "terms to omit", "specify weights",
-
-    # weighted query expansion
-def process_query(query, authors_selected):
-    report = ""
-
-    # get appropriate text from library given authors selected 
-    extracted_texts = crawl("https://www.thelatinlibrary.com", authors_selected)
-    process_extracted_texts(extracted_texts)
-
-    # process query
+def process_query(query):
     tokens = remove_stopwords(word_tokenize(query))
+    query_doc = Document(-1, tokens, "user", "query") # special field values -1, "user" and "query" distinguish the doc as the query
+    return query_doc
+
+def process(query, authors_selected):
+    report = ""
+    extracted_texts = crawl("https://www.thelatinlibrary.com", authors_selected)
+
+    query_doc = process_query(query)
+    text_docs = process_extracted_docs(extracted_texts)
+
+    #query_vec = vectorize_doc(query)
 
     return report
 
@@ -61,7 +69,7 @@ def main():
         authors_selected = (sys.argv[2]).strip().split(',')
 
     # calculate result for client
-    print(process_query(query, authors_selected)) # print to stdout so that javascript can interpret results
+    print(process(query, authors_selected)) # print to stdout so that javascript can interpret results
 
 if __name__ == "__main__":
     main()

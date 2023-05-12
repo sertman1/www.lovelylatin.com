@@ -39,9 +39,9 @@ bad_links = ["ll1/", "ll2/", "caes/", "catullus/", "satire/", "sallust/", "liviu
              "/index.html", "/classics.html", "index.html", "classics.html", "cred.html"]
 
 ### For testing/debugging purposes; cf main crawl loop for commented out 'visitlog.debug(url)'
-import logging
-logging.basicConfig(level=logging.DEBUG, filename='output.log', filemode='w')
-visitlog = logging.getLogger('visited')
+#import logging
+#logging.basicConfig(level=logging.DEBUG, filename='output.log', filemode='w')
+#visitlog = logging.getLogger('visited')
 
 def rank_link(link):
     rank = 0 # the higher the rank, the greater the priority to crawl 
@@ -149,7 +149,7 @@ def crawl(root_domain, authors=[]):
             else:
                 link_to_traverse += root_domain + "/" + author.lower() # standard naming convention (e.g., for people with short names)
 
-            if author == "Catullus" or author == "Gellius": # Catullus, Gellius are only author with shtml formatting
+            if author == "Catullus": # Catullus, Gellius are only author with shtml formatting
                 queue.put(link_to_traverse + ".shtml") 
             else:
                 queue.put(link_to_traverse + ".html")
@@ -172,10 +172,12 @@ def crawl(root_domain, authors=[]):
                     author = "Augustus"
                 elif author == "Catullus.Shtml":
                     author = "Catullus"
+                elif author == "Victor.Caes.Html" or author == "Victor.Ill.Html" or author == "Victor.Origio.Html":
+                    author == "Victor"
 
                 visited.append(url)
                 # for testing/debugging
-                visitlog.debug(url)
+                #visitlog.debug(url)
                 
                 links_on_page = parse_links_sorted(url, html)
                 links_added_to_queue = [] # prevents repeat links from being added 
@@ -197,7 +199,7 @@ def crawl(root_domain, authors=[]):
                 print(e, url)
 
     # for debugging purposes
-    write_to_csv(extracted_works)
+    # write_to_csv(extracted_works)
     return extracted_works
 
 def extract_information(address, html, author):
@@ -228,8 +230,6 @@ def extract_information(address, html, author):
     if author not in extracted_works:
         extracted_works[author] = dict()
 
-    print(title)
-
     (extracted_works[author])[title] = text
 
 def write_to_csv(dict): # to check the success of crawler's extraction
@@ -241,7 +241,6 @@ def main():
     authors = [] # to test crawler, otherwise, crawl imported and handled by processor
     crawl("https://www.thelatinlibrary.com", authors) # populates extracted_works
     # TODO: rank_link?
-    print(len(extracted_works['Cicero']))
 
 if __name__ == '__main__':
     main()
