@@ -44,7 +44,15 @@ function Header(props) {
 
   const getMissionStatement = () => {
     if (hasEntered) {
-      return
+      return <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+      <b>RESULTS:</b>
+      </div>
     }
     return (
       <div

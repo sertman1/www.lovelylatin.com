@@ -44,14 +44,18 @@ function App() {
   }
 
   const enter = async () => {
-    if (userInput === "") {
-      alert('please enter text!')
+    if (authorsSelected.length == 0) {
+      alert('Please select an author!')
+      return
+    }
+    else if (userInput === "") {
+      alert('Please enter text!')
       return
     }
     setHasEntered(true)
     let output = "Processing results, please be patient"
     if (authorsSelected.length === 0) {
-      output += " (full corpus searches take much longer...)"
+      output += " (full corpus searches take much, much longer...)"
     }
 
     setOutput(output)
@@ -112,6 +116,27 @@ function App() {
       </Container>)
     }
 
+    console.log(retrievedTexts)
+
+    if (retrievedTexts.length == 0) {
+      return (<Container maxWidth={false}>
+        <Box
+          component="span"
+          sx={{
+            whiteSpace: 'normal',
+            display: 'block',
+            p: 1,
+            mb: 1,
+            bgcolor: 'white',
+            color: 'grey.300',
+            border: '1px solid',
+            borderColor: 'grey.800',
+          }}>
+          {"Unfortunately, no appropriate documents were found"}
+        </Box>
+      </Container>);
+    }
+ 
     return (
     <Container maxWidth={false}>
       <Box
@@ -147,7 +172,13 @@ function App() {
           >
             {showRetrievedTexts()}
           </Grid>
-          <div>
+          <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        >
             <Button variant="contained" onClick={() => {resetValues()} }>
               Enter more text
             </Button>

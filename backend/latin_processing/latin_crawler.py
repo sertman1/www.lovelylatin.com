@@ -196,7 +196,7 @@ def crawl(root_domain, authors=[]):
 
 
             except Exception as e:
-                print(e, url)
+                visited.append(url)
 
     # for debugging purposes
     # write_to_csv(extracted_works)
