@@ -1,8 +1,10 @@
 import { useState } from "react"
 import axios from "axios"
-import { TextField, Button, Container, Box } from "@material-ui/core"
+import { TextField, Button, Container, Box, Grid } from "@material-ui/core"
+import { Pagination, Typography, Stack} from "@mui/material";
 import Header from "./components/Header.js"
 import Footer from "./components/Footer.js"
+import RetrievedText from "./components/RetreivedText.js";
 
 const API = "http://localhost:5757"
 
@@ -11,18 +13,20 @@ function App() {
   const [output, setOutput] = useState("")
   const [hasEntered, setHasEntered] = useState(false)
   const [authorsSelected, setAuthorsSelected] = useState([])
+  const [retrievedTexts, setRetrievedTexts] = useState([])
+  const [docsRetrieved, setDocsRetrieved] = useState(false)
 
   const resetValues = () => {
     setHasEntered(false); 
     setUserInput(""); 
     setOutput("");
+    setDocsRetrieved(false)
+    retrievedTexts([])
   }
 
   const process_data = (data) => {
     let rank = 0
     let ranks = []
-  
-    console.log(data)
 
     let name_of_work = ""
     for (let i = 0; i < data.length; i++) {
@@ -36,8 +40,7 @@ function App() {
         }
       }
     }
-
-    console.log(ranks)
+    return ranks
   }
 
   const enter = async () => {
@@ -59,8 +62,17 @@ function App() {
             authorsSelected: authorsSelected
         } 
       })
+
       const data = process_data(response.data)
-      setOutput(data)
+
+      setRetrievedTexts(
+        [
+          ...data
+        ]
+      )
+
+      setDocsRetrieved(true)
+      
     } catch (err) {
       alert('Eheu! All apologies, our sever is down...')
       console.log(err)
@@ -80,13 +92,12 @@ function App() {
     }
   }
 
-  const showOptions = () => {
-    if (hasEntered) {
-      return (
-        <div>
-          <Box 
-          component="span" 
-          sx={{ 
+  const showRetrievedTexts = () => {
+    if (!docsRetrieved) {
+      return (<div>
+        <Box
+          component="span"
+          sx={{
             whiteSpace: 'normal',
             display: 'block',
             p: 1,
@@ -94,10 +105,46 @@ function App() {
             bgcolor: 'white',
             color: 'grey.300',
             border: '1px solid',
-            borderColor:'grey.800',
+            borderColor: 'grey.800',
           }}>
-            {output}
-          </Box>
+          {output}
+        </Box>
+      </div>)
+    }
+
+    return (<Box
+      component="span"
+      sx={{
+        whiteSpace: 'normal',
+        display: 'block',
+        p: 1,
+        mb: 1,
+        bgcolor: 'white',
+        color: 'grey.300',
+        border: '1px solid',
+        borderColor: 'grey.800',
+      }}>
+      <Grid>
+        {retrievedTexts.map((text, index) => {
+          if (text !== "The Latin Library")
+            return (
+              <div>{index + 1 + ": " + text}</div>
+            )
+        })}
+      </Grid>
+    </Box>)
+  }
+
+  const showOptions = () => {
+    if (hasEntered) {
+      return (
+        <div>
+          <Grid
+          container
+          justifyContent="center"
+          >
+            {showRetrievedTexts()}
+          </Grid>
           <div>
             <Button variant="contained" onClick={() => {resetValues()} }>
               Enter more text
@@ -138,13 +185,11 @@ function App() {
   return (
     <Container style={{ background: '#e1bee7' }} maxWidth={false}>
 
-        <Header authorsSelected={authorsSelected} setAuthorsSelected={setAuthorsSelected} hasEntered={hasEntered}></Header>
-      <div style={{ height: "25vh" }}>
-          {showOptions()}
-        </div>
-
-        <Footer></Footer>
-
+      <Stack spacing={2}>
+          <Header authorsSelected={authorsSelected} setAuthorsSelected={setAuthorsSelected} hasEntered={hasEntered}></Header>
+            {showOptions()}
+          <Footer/>
+        </Stack>
     </Container>
   );
 
