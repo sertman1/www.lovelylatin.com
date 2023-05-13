@@ -122,9 +122,7 @@ function App() {
         </Box>
       </Container>)
     }
-
-    console.log(retrievedTexts)
-
+    
     if (retrievedTexts.length === 0) {
       return (<Container maxWidth={false}>
         <Box

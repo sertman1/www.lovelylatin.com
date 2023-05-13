@@ -12,13 +12,15 @@ class Document(NamedTuple):
     title_of_work: str
     title_of_work_tokens: List[str]
     url: str
+    score: str
 
     def __repr__(self):
         return (f"doc_id: {self.doc_id}\n" +
             f"  terms: {self.terms}\n" +
             f"  author: {self.author}\n" +
             f"  title: {self.title_of_work}\n" +
-            f"  url: {self.url}\n")
+            f"  url: {self.url}\n" +
+            f"  score: {self.score}")
 
 def compute_doc_freqs(docs: List[Document]):
     freq = Counter()

@@ -47,9 +47,14 @@ def compute_similarities(query_vec, doc_vecs):
         if sim != 0:
             similarities.append((sim, doc[1]))
 
-    similarities = sorted(similarities)
+    similarities = sorted(similarities, reverse=True)
 
-    return sorted(similarities, reverse=True)
+    #i = 0
+    #while i < len(similarities):
+        #if i != 0:
+            #inverted_file[((similarities[i])[1])].score = "(" + str( (similarities[i][0]) / similarities[0][0] ) + ") "
+
+    return similarities
 
 stopwords = word_tokenize("ac adhic an at atque aut autem cum cur de deinde dum enim et etiam etsi ex haud hic hoc iam igitur interim ita itaque magis modo nam ne nec necque neque nisi non quae quam quare quia quicumque quidem quilibet quis quisnam quisquam quisque quisquis quo quoniam sed si nisi sic sive tam tamen tum ubi uel vel uero vero ut . , ; : [ ] < > ?")
 
@@ -83,7 +88,7 @@ def process_extracted_docs(extracted_texts):
             works_text = add_base_form_to_tokens(works_text)
             works_url = ((extracted_texts[author])[title_of_work])[1]
             title_of_work_tokens = word_tokenize(title_of_work.lower())
-            doc = Document(i, works_text, author, title_of_work, title_of_work_tokens, works_url)
+            doc = Document(i, works_text, author, title_of_work, title_of_work_tokens, works_url, "")
             docs.append(doc)
             inverted_file[i] = doc
             i += 1
@@ -92,7 +97,7 @@ def process_extracted_docs(extracted_texts):
 
 def process_query(query):
     tokens = remove_stopwords(word_tokenize(query))
-    query_doc = Document(-1, tokens, "user", "query", [], "/") # special field values -1, "user" "query" "/" distinguish the doc as the query
+    query_doc = Document(-1, tokens, "user", "query", [], "/", "") # special field values -1, "user" "query" "/" distinguish the doc as the query
     return query_doc
 
 def process(query, authors_selected):
@@ -114,7 +119,7 @@ def process(query, authors_selected):
 
     i = 1
     for result in ranked_results:
-        report += (inverted_file[result[1]]).title_of_work +  (inverted_file[result[1]]).url + "\n"
+        report += (inverted_file[result[1]]).score + (inverted_file[result[1]]).title_of_work +  (inverted_file[result[1]]).url + "\n"
         i += 1
 
     return report
