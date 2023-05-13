@@ -17,11 +17,10 @@ inflected_form_to_base_form = process_unimorph_file()
 def compute_doc_freqs(docs: List[Document]):
     freq = Counter()
     for doc in docs:
-        words = set()
-        for term in doc.terms:
-            words.add(term)
-        for word in words:
+        for word in doc.terms:
             freq[word] += 1
+        for word in doc.title_of_work_tokens:
+            freq[word] += 3 # assign a 3 to 1 weight for title terms
     return freq
 
 def dictdot(x: Dict[str, float], y: Dict[str, float]):
@@ -83,7 +82,8 @@ def process_extracted_docs(extracted_texts):
             works_text = remove_stopwords(word_tokenize(works_text.lower()))
             works_text = add_base_form_to_tokens(works_text)
             works_url = ((extracted_texts[author])[title_of_work])[1]
-            doc = Document(i, works_text, author, title_of_work, works_url)
+            title_of_work_tokens = word_tokenize(title_of_work.lower())
+            doc = Document(i, works_text, author, title_of_work, title_of_work_tokens, works_url)
             docs.append(doc)
             inverted_file[i] = doc
             i += 1
@@ -92,7 +92,7 @@ def process_extracted_docs(extracted_texts):
 
 def process_query(query):
     tokens = remove_stopwords(word_tokenize(query))
-    query_doc = Document(-1, tokens, "user", "query", "/") # special field values -1, "user" "query" "/" distinguish the doc as the query
+    query_doc = Document(-1, tokens, "user", "query", [], "/") # special field values -1, "user" "query" "/" distinguish the doc as the query
     return query_doc
 
 def process(query, authors_selected):
